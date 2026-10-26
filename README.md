@@ -35,3 +35,4 @@ To use this VMUL compiler type your .vmul input file and your .html output file.
 $ File dir: file.vmul
 
 $ Compile to: index.html
+More info on info.html
