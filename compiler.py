@@ -26,7 +26,7 @@ def replace(content):
     content = content.replace("$DOUBLEHASHTAG", "##")
     content = content.replace("$ASTERISK", "*")
     content = content.replace("$DOUBLEASTERISK", "**")
-    content = content.replace("$HYPHEN", "**")
+    content = content.replace("$HYPHEN", "-")
     content = content.replace("$UNDERLINE", "_")
     content = content.replace("$EXCLAMATIONMARK", "!")
     return content
