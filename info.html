@@ -1,35 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMUL DOCS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VMUL — Victor MarkUp Language</title>
+<style>
+:root{--bg:#0b0f14;--panel:#111820;--panel2:#0e141b;--border:#26313d;--text:#e8eef5;--muted:#9aa8b7;--accent:#72d6ff;--accent2:#b28cff;--code:#080c10;--green:#7ee787;--yellow:#f2cc60}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.6}
+header{padding:56px 24px 42px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#101722,var(--bg))}
+.wrap{max-width:1100px;margin:auto}.brand{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent);font-size:14px;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(36px,7vw,72px);line-height:1;margin:12px 0}h2{margin-top:0;font-size:30px}h3{color:var(--accent);margin-top:28px}p{color:var(--muted)}
+nav{position:sticky;top:0;z-index:10;background:rgba(11,15,20,.94);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);overflow-x:auto}
+nav .navin{display:flex;gap:6px;padding:10px 16px;max-width:1100px;margin:auto}nav a{color:var(--muted);text-decoration:none;padding:7px 11px;border-radius:7px;white-space:nowrap}nav a:hover{color:var(--text);background:var(--panel)}
+main{padding:38px 20px 80px}section{max-width:1100px;margin:0 auto 56px;scroll-margin-top:70px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.tag{display:inline-block;padding:3px 8px;border:1px solid var(--border);border-radius:6px;background:var(--code);color:var(--accent);font-family:ui-monospace,monospace}
+pre{position:relative;background:var(--code);border:1px solid var(--border);border-radius:9px;padding:18px;overflow-x:auto;color:#d9e2ec;font:14px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.copy{position:absolute;right:9px;top:9px;border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:5px 9px;border-radius:6px;cursor:pointer}.copy:hover{color:var(--text)}
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:10px;overflow:hidden}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}th{color:var(--accent);background:var(--panel2)}td:first-child{font-family:ui-monospace,monospace;color:var(--yellow);white-space:nowrap}
+.note{border-left:3px solid var(--accent2);padding:10px 14px;background:var(--panel)}.good{color:var(--green)}.warn{color:var(--yellow)}
+footer{border-top:1px solid var(--border);padding:28px 20px;color:var(--muted);text-align:center}
+@media(max-width:650px){header{padding-top:38px}th:nth-child(3),td:nth-child(3){display:none}}
+</style>
 </head>
 <body>
-    <h1><b>
-       Commands in VMUL and what's translated in HTML:
-    </h1></b>
-    <p>
-    # -> h1<br>
-    ## -> h2<br>
-    * -> i<br>
-    ** -> b<br>
-    ! -> title<br>
-    % -> var<br>
-    _ -> u<br>
-    - -> s<br>
+<header><div class="wrap">
+<div class="brand">Local Documentation</div>
+<h1>VMUL</h1>
+<p><strong>Victor MarkUp Language</strong> — a simple language that compiles to HTML.</p>
+<div class="card"><p style="margin:0">VMUL uses commands beginning with <span class="tag">$</span>, HTML tags represented with <span class="tag">@</span>, and text substitutions such as <span class="tag">*</span>, <span class="tag">#</span>, <span class="tag">_</span>, and <span class="tag">%</span>.</p></div>
+</div></header>
 
-    $\n -> br<br>
-    $FULLBAR -> meter value = "1"<br>
-    $SEMIBAR -> meter value = "0.5"<br>
-    $ZEROBAR -> meter value = "0"<br>
-    $HASTAG -> #<br>
-    $DOUBLEHASTAG -> ##<br>
-    $EXCLAMATIONMARK -> !<br>
-    $ASTERISK -> *<br>
-    $DOUBLEASTERISK -> **<br>
-    $UNDERLINE -> _<br>
-    $HYPHEN -> -<br>
-    </p>
+<nav><div class="navin">
+<a href="#start">Start</a><a href="#unique">Unique $ Tags</a><a href="#html">@ HTML Tags</a><a href="#combine">Combining Tags</a><a href="#text">Text</a><a href="#example">Full Example</a><a href="#compiler">Compiler</a>
+</div></nav>
+
+<main>
+<section id="start"><h2>How it works</h2>
+<p>The compiler reads a <code>.vmul</code> file, performs the substitutions defined in <code>replace()</code>, and writes the resulting HTML to an output file.</p>
+<pre><button class="copy">Copy</button><code>python vmul.py</code></pre>
+<div class="note"><strong>Flow:</strong> <code>file.vmul</code> → <code>replace()</code> → <code>index.html</code></div>
+</section>
+
+<section id="unique"><h2>Unique tags with <code>$</code></h2>
+<p>These are VMUL-specific commands. They are replaced directly with HTML or with pieces used to build an HTML tag.</p>
+<table><thead><tr><th>VMUL</th><th>HTML output</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>$FULLBAR</td><td><code>&lt;meter value='1'&gt;&lt;/meter&gt;</code></td><td>Meter with value 1.</td></tr>
+<tr><td>$SEMIBAR</td><td><code>&lt;meter value='0.5'&gt;&lt;/meter&gt;</code></td><td>Meter with value 0.5.</td></tr>
+<tr><td>$ZEROBAR</td><td><code>&lt;meter value='0'&gt;&lt;/meter&gt;</code></td><td>Meter with value 0.</td></tr>
+<tr><td>$===</td><td><code>&lt;hr&gt;</code></td><td>Creates a horizontal rule.</td></tr>
+<tr><td>$ONCLICK</td><td><code>onclick="</code></td><td>Starts the onclick attribute.</td></tr>
+<tr><td>$ID</td><td><code>id="</code></td><td>Starts the id attribute.</td></tr>
+<tr><td>$CLASS</td><td><code>class="</code></td><td>Starts the class attribute.</td></tr>
+<tr><td>$WIDTH</td><td><code>width="</code></td><td>Starts the width attribute.</td></tr>
+<tr><td>$HEIGHT</td><td><code>width="</code></td><td>Starts the height attribute <span class="warn">(according to the current compiler)</span>.</td></tr>
+<tr><td>$SRC</td><td><code>src="</code></td><td>Starts the src attribute.</td></tr>
+<tr><td>$ENDATTRIBUTES</td><td><code>"</code></td><td>Closes an attribute string.</td></tr>
+<tr><td>$QUOTE</td><td><code>'</code></td><td>Inserts a single quote.</td></tr>
+<tr><td>$DOUBLEQUOTE</td><td><code>"</code></td><td>Inserts a double quote.</td></tr>
+<tr><td>$CLOSETAG</td><td><code>&gt;</code></td><td>Closes an opening tag.</td></tr>
+<tr><td>$CLOSEENDTAG</td><td><code>&gt;</code></td><td>Also produces <code>&gt;</code>.</td></tr>
+<tr><td>$OPENTAG</td><td><code>&lt;</code></td><td>Starts an HTML tag.</td></tr>
+<tr><td>$OPENENDTAG</td><td><code>&lt;/</code></td><td>Starts an HTML closing tag.</td></tr>
+<tr><td>$HTTPS</td><td><code>https://</code></td><td>HTTPS URL shortcut.</td></tr>
+<tr><td>$HTTP</td><td><code>http://</code></td><td>HTTP URL shortcut.</td></tr>
+<tr><td>$FTP</td><td><code>ftp://</code></td><td>FTP URL shortcut.</td></tr>
+<tr><td>$SFTP</td><td><code>sftp://</code></td><td>SFTP URL shortcut.</td></tr>
+<tr><td>$HASHTAG</td><td><code>#</code></td><td>Inserts a literal <code>#</code>.</td></tr>
+<tr><td>$DOUBLEHASHTAG</td><td><code>##</code></td><td>Inserts literal <code>##</code>.</td></tr>
+<tr><td>$ASTERISK</td><td><code>*</code></td><td>Inserts a literal <code>*</code>.</td></tr>
+<tr><td>$DOUBLEASTERISK</td><td><code>**</code></td><td>Inserts literal <code>**</code>.</td></tr>
+<tr><td>$HYPHEN</td><td><code>-</code></td><td>Inserts a literal <code>-</code>.</td></tr>
+<tr><td>$UNDERLINE</td><td><code>_</code></td><td>Inserts a literal <code>_</code>.</td></tr>
+<tr><td>$EXCLAMATIONMARK</td><td><code>!</code></td><td>Inserts a literal <code>!</code>.</td></tr>
+<tr><td>$<code>\n</code></td><td><code>&lt;br&gt;</code></td><td>A <code>$</code> immediately followed by a newline becomes a line break.</td></tr>
+<tr><td>$<code>\t</code></td><td>two spaces</td><td>A tab immediately following <code>$</code> becomes two spaces.</td></tr>
+</tbody></table>
+</section>
+
+<section id="html"><h2>HTML tags with <code>@</code> syntax</h2>
+<p>The <code>@</code> prefix represents an HTML tag name. It is normally combined with <code>$OPENTAG</code> and <code>$CLOSETAG</code>.</p>
+<div class="grid">
+<div class="card"><span class="tag">@HTML</span> → <code>html</code></div>
+<div class="card"><span class="tag">@HEAD</span> → <code>head</code></div>
+<div class="card"><span class="tag">@TITLE</span> → <code>title</code></div>
+<div class="card"><span class="tag">@BODY</span> → <code>body</code></div>
+<div class="card"><span class="tag">@H1</span> → <code>h1</code></div>
+<div class="card"><span class="tag">@H2</span> → <code>h2</code></div>
+<div class="card"><span class="tag">@B</span> → <code>b</code></div>
+<div class="card"><span class="tag">@I</span> → <code>i</code></div>
+<div class="card"><span class="tag">@IMG</span> → <code>img</code></div>
+<div class="card"><span class="tag">@BUTTON</span> → <code>button</code></div>
+<div class="card"><span class="tag">@SPAN</span> → <code>span</code></div>
+<div class="card"><span class="tag">@EM</span> → <code>em</code></div>
+<div class="card"><span class="tag">@VAR</span> → <code>var</code></div>
+</div></section>
+
+<section id="combine"><h2>Combining tags</h2>
+<p>VMUL can build HTML by combining small commands together.</p>
+<div class="card"><h3>Image example</h3>
+<pre><button class="copy">Copy</button><code>$OPENTAG@IMG $SRC$HTTPSexample.com/image/$CLOSETAG</code></pre>
+<p>Output:</p><pre><code>&lt;img src="https://example.com/image/"&gt;</code></pre></div>
+
+<div class="card"><h3>HTML title example</h3>
+<pre><button class="copy">Copy</button><code>$OPENTAG@TITLE$CLOSETAGMy VMUL Site$OPENENDTAG@TITLE$CLOSETAG</code></pre>
+<p>Output:</p><pre><code>&lt;title&gt;My VMUL Site&lt;/title&gt;</code></pre></div>
+
+<div class="card"><h3>Button with an ID</h3>
+<pre><button class="copy">Copy</button><code>$OPENTAG@BUTTON $IDmyButton$ENDATTRIBUTES$CLOSETAGClick here$OPENENDTAG@BUTTON$CLOSETAG</code></pre>
+<p>Output:</p><pre><code>&lt;button id="myButton"&gt;Click here&lt;/button&gt;</code></pre></div>
+</section>
+
+<section id="text"><h2>Text formatting</h2>
+<table><thead><tr><th>VMUL</th><th>Generated HTML</th></tr></thead><tbody>
+<tr><td>**text**</td><td><code>&lt;b&gt;text&lt;/b&gt;</code></td></tr>
+<tr><td>*text*</td><td><code>&lt;i&gt;text&lt;/i&gt;</code></td></tr>
+<tr><td>%text%</td><td><code>&lt;var&gt;text&lt;/var&gt;</code></td></tr>
+<tr><td>##text##</td><td><code>&lt;h2&gt;text&lt;/h2&gt;</code></td></tr>
+<tr><td>#text#</td><td><code>&lt;h1&gt;text&lt;/h1&gt;</code></td></tr>
+<tr><td>-text-</td><td><code>&lt;s&gt;text&lt;/s&gt;</code></td></tr>
+<tr><td>_text_</td><td><code>&lt;u&gt;text&lt;/u&gt;</code></td></tr>
+<tr><td>!text!</td><td><code>&lt;title&gt;text&lt;/title&gt;</code></td></tr>
+</tbody></table>
+<div class="note"><strong>Escaping:</strong> use a backslash to make a closing delimiter literal instead of interpreting it, such as <code>\*</code>, <code>\#</code>, <code>\_</code>, <code>\-</code>, or <code>\!</code>.</div>
+</section>
+
+<section id="example"><h2>Full example</h2>
+<pre><button class="copy">Copy</button><code>$OPENTAG@HTML$CLOSETAG
+$OPENTAG@HEAD$CLOSETAG
+$OPENTAG@TITLE$CLOSETAGMy VMUL Site$OPENENDTAG@TITLE$CLOSETAG
+$OPENENDTAG@HEAD$CLOSETAG
+$OPENTAG@BODY$CLOSETAG
+#Hello, world!#
+##Made with VMUL##
+$OPENTAG@IMG $SRC$HTTPSexample.com/image/$CLOSETAG
+$OPENTAG@BUTTON $IDbutton$ENDATTRIBUTES $CLOSETAGClick here$OPENENDTAG@BUTTON$CLOSETAG
+$FULLBAR
+$OPENENDTAG@BODY$CLOSETAG
+$OPENENDTAG@HTML$CLOSETAG</code></pre>
+<p>This example demonstrates unique tags, <code>@</code> HTML tags, attributes, and combinations of multiple substitutions.</p>
+</section>
+
+<section id="compiler"><h2>Current compiler</h2>
+<p>This documentation is based directly on the supplied <code>replace()</code> function. The compiler performs string replacements in sequence.</p>
+<div class="card"><h3>Input</h3><pre><code>file.vmul</code></pre><h3>Default output</h3><pre><code>index.html</code></pre><p>If the input fields are left empty, the program uses <code>file.vmul</code> as input and <code>index.html</code> as output.</p></div>
+<div class="note"><strong class="warn">Important:</strong> <code>$HEIGHT</code> currently becomes <code>width="</code>, not <code>height="</code>. This page documents the actual behavior of the supplied compiler.</div>
+</section>
+</main>
+<footer>VMUL — Victor MarkUp Language · Local Documentation</footer>
+<script>
+document.querySelectorAll('.copy').forEach(button=>{
+button.addEventListener('click',async()=>{
+const code=button.parentElement.querySelector('code').innerText;
+try{await navigator.clipboard.writeText(code);const old=button.innerText;button.innerText='Copied!';setTimeout(()=>button.innerText=old,1200)}
+catch{button.innerText='Failed';setTimeout(()=>button.innerText='Copy',1200)}
+});
+});
+</script>
 </body>
 </html>
